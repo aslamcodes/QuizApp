@@ -16,7 +16,25 @@
 
         public override string ToString()
         {
-            return base.ToString();
+            string output = "";
+
+            output += $"Question - {Question}\n";
+
+            output += "Correct Answer\n";
+            foreach (string options in CorrectAnswers)
+            {
+                output += $"{options}\n";
+
+            }
+
+            output += $"\nWrong Answers\n";
+            foreach (string options in WrongAnswers)
+            {
+                output += $"{options}\n";
+
+            }
+
+            return output;
         }
 
         public override bool Equals(object? obj)
