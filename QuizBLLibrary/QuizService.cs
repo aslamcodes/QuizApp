@@ -43,7 +43,13 @@ namespace QuizBLLibrary
         {
             var quizzes = _quizRepository.GetAll();
 
-            return quizzes ?? throw new QuizNotFoundException();
+            var publishedQuizzes = from quiz in quizzes
+                                   where quiz.isPublished == true
+                                   select quiz;
+
+
+
+            return publishedQuizzes.ToList() ?? throw new QuizNotFoundException();
         }
 
         public Quiz GetQuizById(int id)
