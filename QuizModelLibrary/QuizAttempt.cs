@@ -20,7 +20,7 @@
 
         public override bool Equals(object? obj)
         {
-            return Id == (obj as Quiz).Id;
+            return Id == (obj as QuizAttempt).Id;
         }
     }
 }
