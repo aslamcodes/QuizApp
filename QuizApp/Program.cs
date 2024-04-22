@@ -37,12 +37,37 @@ namespace QuizApp
             }
             return output;
         }
-        public void PrintAllQuizzes()
+        public void PrintAllQuizzes(bool onlyUserQuiz)
         {
-            foreach (Quiz quiz in GetAllQuizzes())
+            try
             {
-                Console.WriteLine($"{quiz.Id} - {quiz}\n");
+                List<Quiz> quizzes;
+                if (onlyUserQuiz)
+                {
+                    quizzes = _quizService.GetAllCreatedQuizzesForUser(LoggedInUser.Id);
+                }
+                else
+                {
+                    quizzes = _quizService.GetAllQuizzes();
+                }
+
+                foreach (Quiz quiz in quizzes)
+                {
+                    Console.WriteLine(quiz);
+                }
             }
+            catch (Exception)
+            {
+                Console.WriteLine("No Quizzes created!");
+            }
+
+        }
+
+        public static void WaitUntilAnyKeyPress()
+        {
+            Console.WriteLine("Press a key to continue");
+            Console.ReadKey();
+            Console.Clear();
         }
         public static List<QuizQuestion> GenerateQuizQuestions(int numberOfQuestions)
         {
@@ -100,7 +125,7 @@ namespace QuizApp
         }
         public void RemoveQuiz()
         {
-            PrintAllQuizzes();
+            PrintAllQuizzes(true);
 
             int id = GetIntegerInputFromConsole("Select a Quiz id");
 
@@ -112,7 +137,7 @@ namespace QuizApp
         {
             try
             {
-                PrintAllQuizzes();
+                PrintAllQuizzes(true);
                 int id = GetIntegerInputFromConsole("Select Quiz Id");
                 Console.WriteLine("Enter new Name");
                 string newQuizTitle = Console.ReadLine() ?? string.Empty;
@@ -132,22 +157,34 @@ namespace QuizApp
         }
         public void Login()
         {
-            Console.WriteLine("Enter your username");
-            string username = Console.ReadLine();
-            Console.WriteLine("Enter the password");
-            string password = Console.ReadLine();
-            try
+            LoggedInUser = null;
+            User? user = null;
+            while (user == null || LoggedInUser == null)
             {
-                var User = _userService.GetUserByUserName(username);
-                if (password == User.Password)
+                try
                 {
-                    LoggedInUser = User;
+                    Console.WriteLine("Enter your username");
+                    string username = Console.ReadLine();
+                    Console.WriteLine("Enter the password");
+                    string password = Console.ReadLine();
+
+                    user = _userService.GetUserByUserName(username);
+                    if (password == user.Password)
+                    {
+                        LoggedInUser = user;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Wrong Password");
+                        WaitUntilAnyKeyPress();
+                    }
+                    Console.Clear();
                 }
-            }
-            catch (Exception)
-            {
+                catch (Exception)
+                {
+                    Console.WriteLine("Invalid Creds, please try again!");
 
-
+                }
             }
 
 
@@ -159,13 +196,11 @@ namespace QuizApp
             while (choice != -1)
             {
 
-                Console.WriteLine("\nMenu\n1. Create a new Quiz\n2. List all your Quizzes\n3. Remove Quiz\n4. Change Quiz Title");
+                Console.WriteLine("Menu\n1. Create a new Quiz\n2. List all your Quizzes\n3. Remove Quiz\n4. Change Quiz Title\n5. Publish your Quizzes\n-1. Exit Quiz Management");
 
-                Console.WriteLine("Enter Choice");
-                while (!int.TryParse(Console.ReadLine(), out choice))
-                {
-                    Console.WriteLine("Invalid Format");
-                }
+                choice = GetIntegerInputFromConsole("Enter Choice");
+
+                Console.Clear();
 
                 switch (choice)
                 {
@@ -174,7 +209,7 @@ namespace QuizApp
                         break;
 
                     case 2:
-                        PrintAllQuizzes();
+                        PrintAllQuizzes(true);
                         break;
 
                     case 3:
@@ -184,20 +219,124 @@ namespace QuizApp
                     case 4:
                         ChangeQuizTitle();
                         break;
+                    case 5:
+                        PublishYourQuiz();
+                        break;
+                    case -1:
+                        break;
 
                     default:
                         Console.WriteLine("Invalid Choice");
                         break;
                 }
 
-                Console.WriteLine("Press a key to continue");
-                Console.ReadKey();
-                Console.Clear();
+                WaitUntilAnyKeyPress();
             }
+        }
+
+        private void PublishYourQuiz()
+        {
+            PrintAllQuizzes(true);
+
+            try
+            {
+                int quizID = GetIntegerInputFromConsole("Select Quiz Id");
+
+                var quiz = _quizService.GetQuizById(quizID);
+
+                quiz.isPublished = true;
+
+                _quizService.UpdatePublishStatus(quiz);
+            }
+            catch (Exception)
+            {
+
+                Console.WriteLine("Something went wrong, Please Try again");
+                WaitUntilAnyKeyPress();
+            }
+
+        }
+
+        public static bool IsUserAnswerCorrect(QuizQuestion question)
+        {
+            Console.WriteLine($"\n{question.Question}");
+            List<string> answers = [.. question.WrongAnswers];
+
+            int correctIndex = new Random().Next(0, answers.Count - 1);
+
+            answers.Insert(correctIndex, question.CorrectAnswers[0]);
+
+            Console.WriteLine("Options");
+            for (int i = 0; i < answers.Count; i++)
+            {
+                Console.WriteLine($"{i} - {answers[i]}");
+            }
+
+            bool isCorrectAnswer = correctIndex == GetIntegerInputFromConsole("Pick one");
+
+            Console.WriteLine(isCorrectAnswer ? "Correct Answer" : "Wrong Answer");
+
+            Console.WriteLine("Press any key to continue");
+            Console.ReadKey();
+            Console.Clear();
+
+            return isCorrectAnswer;
         }
         public void TakeQuiz()
         {
+            PrintAllQuizzes(false);
 
+            int quizId = GetIntegerInputFromConsole("Select a Quiz id");
+
+            Quiz quiz = _quizService.GetQuizById(quizId);
+
+            User user = LoggedInUser;
+
+            int score = 0;
+
+            List<QuizQuestion> correctlyAnswered = [];
+            List<QuizQuestion> wrongAnswers = [];
+
+            foreach (QuizQuestion question in quiz.QuizQuestions)
+            {
+
+                if (IsUserAnswerCorrect(question))
+                {
+                    correctlyAnswered.Add(question); score++;
+                }
+                else
+                {
+                    wrongAnswers.Add(question);
+                }
+            }
+
+            Console.WriteLine($"Total Score ${score}");
+
+            Console.WriteLine("Press any key to continue");
+
+            Console.ReadKey();
+
+            Console.Clear();
+
+            QuizAttempt currentAttempt = new(quizId, user.Id, score, correctlyAnswered, wrongAnswers);
+
+            _quizAttemptService.AddQuizAttempt(currentAttempt);
+        }
+
+
+        private void LastQuizReview()
+        {
+            var attempts = _quizAttemptService.GetAllQuizAttemptsForUser(LoggedInUser);
+
+            if (attempts.Count == 0)
+            {
+                Console.WriteLine("No Quiz Taken");
+            }
+            else
+            {
+                Console.WriteLine(attempts.Last());
+
+            }
         }
         static void Main(string[] args)
         {
@@ -215,18 +354,42 @@ namespace QuizApp
                 Console.WriteLine("1. Manage your Quizzes");
                 Console.WriteLine("2. Take Quiz!");
                 Console.WriteLine("3. Review Your last Quiz");
+                Console.WriteLine("4. Switch User Accounts");
+                Console.WriteLine("-1. Quit");
 
                 choice = GetIntegerInputFromConsole("Enter a Choice");
-
+                Console.Clear();
                 switch (choice)
                 {
                     case 1:
                         program.QuizManagement();
                         break;
+                    case 2:
+                        program.TakeQuiz();
+                        break;
+                    case 3:
+                        program.LastQuizReview();
+                        break;
+                    case 4:
+                        program.SwitchAccount();
+                        break;
+                    case -1:
+                        break;
+
+
+                    default:
+                        Console.WriteLine("Invalid Choice");
+                        break;
                 }
 
             }
 
+        }
+
+        private void SwitchAccount()
+        {
+            LoggedInUser = null;
+            Login();
         }
     }
 }

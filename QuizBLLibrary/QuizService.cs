@@ -52,12 +52,35 @@ namespace QuizBLLibrary
             return publishedQuizzes.ToList() ?? throw new QuizNotFoundException();
         }
 
+        public List<Quiz> GetAllCreatedQuizzesForUser(int userId)
+        {
+            var quizzes = _quizRepository.GetAll();
+
+            if (quizzes == null) throw new QuizNotFoundException();
+
+            var userQuizzes = from quiz in quizzes
+                              where quiz.CreatedBy.Id == userId
+                              select quiz;
+
+            return userQuizzes.ToList();
+        }
+
         public Quiz GetQuizById(int id)
         {
             var quiz = _quizRepository.Get(id);
 
             if (quiz != null) return quiz;
 
+            throw new QuizNotFoundException();
+        }
+
+        public Quiz UpdatePublishStatus(Quiz quiz)
+        {
+            var updateQuiz = _quizRepository.Update(quiz);
+            if (updateQuiz != null)
+            {
+                return updateQuiz;
+            }
             throw new QuizNotFoundException();
         }
     }

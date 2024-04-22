@@ -14,7 +14,7 @@
 
         public override string ToString()
         {
-            return $"Title {Title}\nDescription {Description}";
+            return $"Id {Id}\nTitle {Title}\nDescription {Description}";
         }
 
         public override bool Equals(object? obj)
