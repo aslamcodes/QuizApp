@@ -7,4 +7,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\QuizBLLibrary\QuizBLLibrary.csproj" />
+    <ProjectReference Include="..\QuizModelLibrary\QuizModelLibrary.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -10,7 +10,7 @@
 
         public override string ToString()
         {
-            return base.ToString();
+            return $"Title {Title}\nDescription {Description}";
         }
 
         public override bool Equals(object? obj)
