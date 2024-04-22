@@ -7,6 +7,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuizApp", "QuizApp\QuizApp.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuizModelLibrary", "QuizModelLibrary\QuizModelLibrary.csproj", "{99584B83-4116-4FEF-A526-5570ED5A91FB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuizBLLibrary", "QuizBLLibrary\QuizBLLibrary.csproj", "{C808E05B-5821-4749-B5E2-06CC831AB34B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuizDALLibrary", "QuizDALLibrary\QuizDALLibrary.csproj", "{0937BBCD-5530-4611-A9FD-748DEF3B2654}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{99584B83-4116-4FEF-A526-5570ED5A91FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{99584B83-4116-4FEF-A526-5570ED5A91FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{99584B83-4116-4FEF-A526-5570ED5A91FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C808E05B-5821-4749-B5E2-06CC831AB34B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C808E05B-5821-4749-B5E2-06CC831AB34B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C808E05B-5821-4749-B5E2-06CC831AB34B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C808E05B-5821-4749-B5E2-06CC831AB34B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0937BBCD-5530-4611-A9FD-748DEF3B2654}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0937BBCD-5530-4611-A9FD-748DEF3B2654}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0937BBCD-5530-4611-A9FD-748DEF3B2654}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0937BBCD-5530-4611-A9FD-748DEF3B2654}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
