@@ -1,7 +1,6 @@
 ﻿namespace QuizModelLibrary
 {
-    public class Class1
+    public class User
     {
-
     }
 }
